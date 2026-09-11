@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pactelys — Prototype fiche client</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root{
+    --bg:#F3F4F1;
+    --panel:#FFFFFF;
+    --ink:#14171A;
+    --ink-soft:#565C55;
+    --line:#DCDAD3;
+    --accent:#2F6F62;
+    --accent-soft:#E4EDE9;
+    --warn:#A85C2E;
+    --warn-soft:#F5E9DE;
+    --mono:#6B6F66;
+    --radius:4px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans',sans-serif;
+    font-size:14.5px;
+    line-height:1.55;
+  }
+  h1,h2,h3{font-family:'Source Serif 4',serif; font-weight:600; margin:0;}
+  .app{display:grid; grid-template-columns:220px 1fr 380px; min-height:100vh;}
+
+  /* --- Nav rail --- */
+  nav{
+    border-right:1px solid var(--line);
+    padding:28px 18px;
+    position:sticky; top:0; height:100vh; overflow-y:auto;
+  }
+  nav .brand{font-family:'Source Serif 4',serif; font-size:19px; margin-bottom:4px;}
+  nav .brand-sub{font-size:12px; color:var(--ink-soft); margin-bottom:28px;}
+  nav a{
+    display:block; color:var(--ink-soft); text-decoration:none;
+    font-size:13.5px; padding:7px 0; border-bottom:1px solid transparent;
+  }
+  nav a:hover{color:var(--accent);}
+  nav .step-num{
+    display:inline-block; width:18px; font-family:'IBM Plex Mono',monospace;
+    font-size:11px; color:var(--mono);
+  }
+
+  /* --- Main form column --- */
+  main{padding:40px 48px 120px; max-width:640px;}
+  header.intro{margin-bottom:40px;}
+  header.intro p{color:var(--ink-soft); max-width:52ch;}
+
+  section{margin-bottom:52px; scroll-margin-top:24px;}
+  section .section-head{
+    display:flex; align-items:baseline; gap:10px;
+    border-bottom:1px solid var(--line); padding-bottom:10px; margin-bottom:20px;
+  }
+  section .section-head h2{font-size:20px;}
+  section .table-tag{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--mono);
+    background:var(--accent-soft); padding:2px 7px; border-radius:3px;
+    margin-left:auto;
+  }
+  section .section-desc{color:var(--ink-soft); font-size:13px; margin:-10px 0 18px;}
+
+  .field{margin-bottom:18px;}
+  .field label{
+    display:flex; align-items:center; gap:8px;
+    font-size:13px; font-weight:500; margin-bottom:6px;
+  }
+  .field label .col{
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--mono); font-weight:400;
+  }
+  .field .hint{font-size:12px; color:var(--ink-soft); margin-top:4px;}
+  input[type=text], input[type=url], input[type=password], select, textarea{
+    width:100%; padding:9px 11px; font-family:inherit; font-size:14px;
+    border:1px solid var(--line); border-radius:var(--radius); background:var(--panel); color:var(--ink);
+  }
+  textarea{resize:vertical; min-height:64px;}
+  input:focus, select:focus, textarea:focus{outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent);}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+
+  /* tag list widget */
+  .taglist{
+    border:1px solid var(--line); border-radius:var(--radius); padding:8px; background:var(--panel);
+  }
+  .taglist .tags{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px;}
+  .taglist .tags:empty{margin-bottom:0;}
+  .tag{
+    display:flex; align-items:center; gap:6px;
+    background:var(--accent-soft); color:#1E4A40; font-size:12.5px;
+    padding:4px 8px; border-radius:3px;
+  }
+  .tag button{
+    all:unset; cursor:pointer; font-size:13px; line-height:1; color:#1E4A40; opacity:.6;
+  }
+  .tag button:hover{opacity:1;}
+  .taglist input{border:none; padding:4px 2px; font-size:13.5px;}
+  .taglist input:focus{outline:none;}
+
+  /* ordered funnel steps */
+  .funnel-step{display:flex; gap:8px; align-items:center; margin-bottom:8px;}
+  .funnel-step .step-index{
+    font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--mono); width:16px;
+  }
+  .funnel-step input{flex:1;}
+  .funnel-step button, .add-row{
+    all:unset; cursor:pointer; font-size:12.5px; color:var(--accent); font-weight:500;
+  }
+  .add-row{display:inline-block; margin-top:2px;}
+
+  .checkbox-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .checkbox-row{
+    display:flex; align-items:flex-start; gap:9px; border:1px solid var(--line);
+    border-radius:var(--radius); padding:10px 12px; background:var(--panel);
+  }
+  .checkbox-row input{width:auto; margin-top:2px;}
+  .checkbox-row .cb-label{font-size:13px; font-weight:500;}
+  .checkbox-row .cb-sub{font-size:11.5px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
+
+  .note{
+    background:var(--warn-soft); border-left:3px solid var(--warn);
+    padding:10px 13px; font-size:12.8px; color:#5C3417; border-radius:0 3px 3px 0; margin-bottom:20px;
+  }
+  .byok-disabled{
+    opacity:.55; pointer-events:none;
+  }
+
+  /* --- JSON preview panel --- */
+  aside{
+    border-left:1px solid var(--line); background:#FAFAF8;
+    position:sticky; top:0; height:100vh; display:flex; flex-direction:column;
+  }
+  aside .aside-head{padding:22px 24px 14px; border-bottom:1px solid var(--line);}
+  aside .aside-head h3{font-size:15px;}
+  aside .aside-head p{font-size:12px; color:var(--ink-soft); margin:6px 0 0;}
+  aside pre{
+    flex:1; margin:0; padding:18px 20px 100px; overflow:auto;
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; line-height:1.6; color:#2C332E;
+    white-space:pre-wrap; word-break:break-word;
+  }
+  aside .aside-actions{
+    position:sticky; bottom:0; background:#FAFAF8; border-top:1px solid var(--line);
+    padding:14px 20px; display:flex; gap:8px;
+  }
+  aside button.action{
+    flex:1; padding:9px 0; font-family:inherit; font-size:12.5px; font-weight:500;
+    border:1px solid var(--accent); background:var(--accent); color:#fff; border-radius:var(--radius);
+    cursor:pointer;
+  }
+  aside button.action.secondary{background:transparent; color:var(--accent);}
+  aside button.action:hover{opacity:.9;}
+
+  @media (max-width: 1100px){
+    .app{grid-template-columns:1fr;}
+    nav, aside{position:relative; height:auto;}
+  }
+  .submit-btn {
+  width: 100%;
+  padding: 14px 24px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.submit-btn:hover {
+  opacity: 0.9;
+}
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.submit-status {
+  margin-top: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  display: none;
+}
+.submit-status.success {
+  display: block;
+  background: #E4F4E9;
+  color: #1E5631;
+  border: 1px solid #B8E6C4;
+}
+.submit-status.error {
+  display: block;
+  background: #FFEAE6;
+  color: #8B2E1F;
+  border: 1px solid #FFB8A8;
+}
+.submit-status.loading {
+  display: block;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- NAV -->
+  <nav>
+    <div class="brand">Pactelys</div>
+    <div class="brand-sub">Fiche client — prototype</div>
+    <a href="#identite"><span class="step-num">01</span>Identité</a>
+    <a href="#promesse"><span class="step-num">02</span>Promesse centrale</a>
+    <a href="#valeur"><span class="step-num">03</span>Proposition de valeur</a>
+    <a href="#icp"><span class="step-num">04</span>ICP — client idéal</a>
+    <a href="#adn"><span class="step-num">05</span>ADN économique</a>
+    <a href="#taxonomie"><span class="step-num">06</span>Taxonomie (provisoire)</a>
+    <a href="#regles"><span class="step-num">07</span>Règles &amp; tunnel</a>
+    <a href="#api"><span class="step-num">08</span>Connexion IA</a>
+    <a href="#actions"><span class="step-num">09</span>Actions activées</a>
+  </nav>
+
+  <!-- FORM -->
+  <main>
+    <header class="intro">
+      <h1>Fiche de configuration client</h1>
+      <p>Prototype statique — sert à valider la liste des champs avant de les coder dans Next.js ou WordPress. Rien n'est envoyé au serveur ; l'aperçu à droite montre exactement la forme du JSON que l'API recevra.</p>
+    </header>
+
+    <!-- 01 IDENTITE -->
+    <section id="identite">
+      <div class="section-head"><h2>Identité de l'entreprise</h2><span class="table-tag">client_config</span></div>
+      <div class="field">
+        <label>Nom de l'entreprise</label>
+        <input type="text" data-path="identite.company_name" placeholder="Ex. Praxitele">
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Secteur</label>
+          <input type="text" data-path="identite.sector" placeholder="Ex. Agence SEO / GEO">
+        </div>
+        <div class="field">
+          <label>Taille de l'entreprise <span class="col">company_size</span></label>
+          <select data-path="identite.company_size">
+            <option value="">—</option>
+            <option>1-5</option><option>5-50</option><option>50-250</option><option>250+</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>CA cible</label>
+          <input type="text" data-path="identite.target_revenue" placeholder="Ex. 1M–50M EUR">
+        </div>
+        <div class="field">
+          <label>Marché géographique</label>
+          <input type="text" data-path="identite.market" placeholder="Ex. France, Europe">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>URL du site web</label>
+          <input type="url" data-path="identite.website_url" placeholder="https://...">
+        </div>
+        <div class="field">
+          <label>Langue de contenu <span class="col">content_language</span></label>
+          <select data-path="identite.content_language">
+            <option value="fr-FR" selected>fr-FR</option>
+            <option value="en-US">en-US</option>
+            <option value="es-ES">es-ES</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 PROMESSE -->
+    <section id="promesse">
+      <div class="section-head"><h2>Promesse centrale</h2><span class="table-tag">core_promise</span></div>
+      <p class="section-desc">La phrase à laquelle tout contenu généré doit se rattacher.</p>
+      <div class="field">
+        <textarea data-path="promesse.core_promise" placeholder="Ex. Aider les PME à transformer leur visibilité en trafic qualifié..."></textarea>
+      </div>
+    </section>
+
+    <!-- 03 VALEUR -->
+    <section id="valeur">
+      <div class="section-head"><h2>Proposition de valeur</h2><span class="table-tag">client_config</span></div>
+      <div class="field">
+        <label>Problème résolu</label>
+        <textarea data-path="valeur.problem"></textarea>
+      </div>
+      <div class="field">
+        <label>Bénéfice principal</label>
+        <textarea data-path="valeur.benefit"></textarea>
+      </div>
+      <div class="field">
+        <label>Différenciateur clé</label>
+        <textarea data-path="valeur.differentiator"></textarea>
+      </div>
+    </section>
+
+    <!-- 04 ICP -->
+    <section id="icp">
+      <div class="section-head"><h2>ICP — client idéal</h2><span class="table-tag">client_config</span></div>
+      <div class="field">
+        <label>Secteur cible</label>
+        <textarea data-path="icp.target_sector" placeholder="Ex. PME/ETI B2B, e-commerce, SaaS..."></textarea>
+      </div>
+      <div class="field">
+        <label>Taille d'entreprise cible</label>
+        <input type="text" data-path="icp.company_size" placeholder="Ex. 5 à 500 salariés">
+      </div>
+      <div class="field">
+        <label>Zone géographique</label>
+        <input type="text" data-path="icp.geography">
+      </div>
+      <div class="field">
+        <label>Titres de contact prioritaires <span class="col">icp_primary_titles</span></label>
+        <div class="taglist" data-taglist="icp.primary_titles">
+          <div class="tags"></div>
+          <input type="text" placeholder="Taper un titre puis Entrée">
+        </div>
+      </div>
+      <div class="field">
+        <label>Titres de contact secondaires</label>
+        <div class="taglist" data-taglist="icp.secondary_titles">
+          <div class="tags"></div>
+          <input type="text" placeholder="Taper un titre puis Entrée">
+        </div>
+      </div>
+      <div class="field">
+        <label>Signaux d'achat <span class="col">icp_buying_signals</span></label>
+        <div class="taglist" data-taglist="icp.buying_signals">
+          <div class="tags"></div>
+          <input type="text" placeholder="Ex. Baisse du trafic organique">
+        </div>
+      </div>
+      <div class="field">
+        <label>Critères d'exclusion</label>
+        <div class="taglist" data-taglist="icp.exclusion_criteria">
+          <div class="tags"></div>
+          <input type="text" placeholder="Ex. Concurrent direct">
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 ADN -->
+    <section id="adn">
+      <div class="section-head"><h2>ADN économique</h2><span class="table-tag">company_dna</span></div>
+      <p class="section-desc">Alimente le matching, les recommandations et la classification des annonces.</p>
+      <div class="row2">
+        <div class="field">
+          <label>Secteurs</label>
+          <div class="taglist" data-taglist="adn.sectors"><div class="tags"></div><input type="text"></div>
+        </div>
+        <div class="field">
+          <label>Activités</label>
+          <div class="taglist" data-taglist="adn.activities"><div class="tags"></div><input type="text"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Compétences</label>
+          <div class="taglist" data-taglist="adn.skills"><div class="tags"></div><input type="text"></div>
+        </div>
+        <div class="field">
+          <label>Technologies utilisées</label>
+          <div class="taglist" data-taglist="adn.technologies"><div class="tags"></div><input type="text"></div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Produits</label>
+          <div class="taglist" data-taglist="adn.products"><div class="tags"></div><input type="text"></div>
+        </div>
+        <div class="field">
+          <label>Services</label>
+          <div class="taglist" data-taglist="adn.services"><div class="tags"></div><input type="text"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Besoins</label>
+        <div class="taglist" data-taglist="adn.needs"><div class="tags"></div><input type="text"></div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Fournisseurs recherchés</label>
+          <div class="taglist" data-taglist="adn.seeking_suppliers"><div class="tags"></div><input type="text"></div>
+        </div>
+        <div class="field">
+          <label>Clients recherchés</label>
+          <div class="taglist" data-taglist="adn.seeking_clients"><div class="tags"></div><input type="text"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Zones géographiques</label>
+        <div class="taglist" data-taglist="adn.geographic_zones"><div class="tags"></div><input type="text"></div>
+      </div>
+    </section>
+
+    <!-- 06 TAXONOMIE -->
+    <section id="taxonomie">
+      <div class="section-head"><h2>Taxonomie des opportunités</h2><span class="table-tag">taxonomy_*</span></div>
+      <div class="note">Provisoire — structure encore en cadrage avec l'équipe. Champs en texte libre ici ; deviendront des listes fermées une fois validées.</div>
+      <div class="row2">
+        <div class="field">
+          <label>Intention</label>
+          <select data-path="taxonomie.intention">
+            <option value="">—</option>
+            <option>je_recherche</option><option>je_propose</option>
+            <option>je_souhaite_collaborer</option><option>je_souhaite_acheter_vendre</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Type d'opportunité</label>
+          <select data-path="taxonomie.opportunity_type">
+            <option value="">—</option>
+            <option>clients</option><option>fournisseurs</option><option>prestataires</option>
+            <option>partenaires</option><option>sous_traitance</option><option>recrutement</option>
+            <option>financement</option><option>equipements</option><option>immobilier</option>
+            <option>achats_groupes</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Secteur</label><input type="text" data-path="taxonomie.sector"></div>
+        <div class="field"><label>Activité</label><input type="text" data-path="taxonomie.activity"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Fonction</label><input type="text" data-path="taxonomie.function"></div>
+        <div class="field"><label>Localisation</label><input type="text" data-path="taxonomie.location"></div>
+      </div>
+      <div class="field">
+        <label>Critères</label>
+        <textarea data-path="taxonomie.criteria"></textarea>
+      </div>
+    </section>
+
+    <!-- 07 REGLES -->
+    <section id="regles">
+      <div class="section-head"><h2>Règles &amp; tunnel de conversion</h2><span class="table-tag">client_config</span></div>
+      <div class="field">
+        <label>Ton <span class="col">tone_of_voice</span></label>
+        <select data-path="regles.tone_of_voice">
+          <option value="vouvoiement" selected>Vouvoiement</option>
+          <option value="tutoiement">Tutoiement</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Règles de comportement</label>
+        <div class="taglist" data-taglist="regles.behavior_rules">
+          <div class="tags"></div>
+          <input type="text" placeholder="Ex. Ne jamais garantir un résultat chiffré">
+        </div>
+      </div>
+      <div class="field">
+        <label>Lien CTA principal <span class="col">key_urls.primary_cta</span></label>
+        <input type="url" data-path="regles.primary_cta_url" placeholder="https://.../#audit-title">
+      </div>
+      <div class="field">
+        <label>Tunnel de conversion <span class="col">conversion_funnel</span></label>
+        <div id="funnel-list"></div>
+        <button type="button" class="add-row" id="add-funnel-step">+ Ajouter une étape</button>
+      </div>
+    </section>
+
+    <!-- 08 API -->
+    <section id="api">
+      <div class="section-head"><h2>Connexion IA (BYOK)</h2><span class="table-tag">ai_connections</span></div>
+      <div class="note">Ces champs sont désactivés dans ce prototype : la clé ne doit jamais transiter ni être stockée hors du backend sécurisé — figure ici uniquement pour valider la forme du formulaire final.</div>
+      <div class="row2 byok-disabled">
+        <div class="field">
+          <label>Fournisseur</label>
+          <select><option>Anthropic</option><option>OpenAI</option></select>
+        </div>
+        <div class="field">
+          <label>Clé API</label>
+          <input type="password" placeholder="sk-ant-...">
+        </div>
+      </div>
+    </section>
+
+    <!-- 09 ACTIONS -->
+    <section id="actions">
+      <div class="section-head"><h2>Actions activées</h2><span class="table-tag">client_enabled_actions</span></div>
+      <div class="checkbox-grid" id="actions-grid"></div>
+    </section>
+
+    <!-- SOUMISSION -->
+<section id="soumission">
+  <div class="section-head">
+    <h2>Valider et enregistrer</h2>
+  </div>
+  <div class="field">
+    <button type="button" id="submit-config" class="submit-btn">
+      Enregistrer la configuration
+    </button>
+    <div id="submit-status" class="submit-status"></div>
+  </div>
+</section>
+
+  </main>
+
+  <!-- JSON PREVIEW -->
+  <aside>
+    <div class="aside-head">
+      <h3>Aperçu JSON en direct</h3>
+      <p>Forme exacte de l'objet que l'API recevrait.</p>
+    </div>
+    <pre id="json-preview">{}</pre>
+    <div class="aside-actions">
+      <button class="action secondary" id="copy-json">Copier</button>
+      <button class="action" id="download-json">Télécharger</button>
+    </div>
+  </aside>
+
+</div>
+
+<script>
+  const state = {
+    identite: {}, promesse: {}, valeur: {}, icp: {
+      primary_titles: [], secondary_titles: [], buying_signals: [], exclusion_criteria: []
+    },
+    adn: {
+      sectors: [], activities: [], skills: [], technologies: [],
+      products: [], services: [], needs: [], seeking_suppliers: [],
+      seeking_clients: [], geographic_zones: []
+    },
+    taxonomie: {},
+    regles: { behavior_rules: [], conversion_funnel: [] },
+    actions_enabled: []
+  };
+
+  const ACTIONS = [
+    ["generate_blog_article", "Rédiger un article de blog"],
+    ["plan_content_calendar", "Construire un calendrier éditorial"],
+    ["audit_website", "Auditer un site"],
+    ["build_keyword_strategy", "Stratégie de mots-clés"],
+    ["optimize_page", "Optimiser une page"],
+    ["produce_social_posts", "Produire des posts sociaux"],
+    ["design_email_campaign", "Concevoir une campagne email"],
+    ["build_email_automation", "Automatisation email"],
+    ["run_market_landscape_study", "Étude de marché"],
+    ["define_brand_platform", "Définir la plateforme de marque"]
+  ];
+
+  function setPath(obj, path, value){
+    const parts = path.split(".");
+    let cur = obj;
+    for (let i=0; i<parts.length-1; i++){ cur = cur[parts[i]] ??= {}; }
+    cur[parts[parts.length-1]] = value;
+  }
+
+  function renderJSON(){
+    document.getElementById("json-preview").textContent = JSON.stringify(state, null, 2);
+  }
+
+  // simple inputs / selects / textareas
+  document.querySelectorAll("[data-path]").forEach(el=>{
+    el.addEventListener("input", ()=>{ setPath(state, el.dataset.path, el.value); renderJSON(); });
+  });
+
+  // tag lists
+  document.querySelectorAll("[data-taglist]").forEach(widget=>{
+    const path = widget.dataset.taglist;
+    const tagsEl = widget.querySelector(".tags");
+    const input = widget.querySelector("input");
+    const [group, key] = path.split(".");
+
+    function render(){
+      tagsEl.innerHTML = "";
+      state[group][key].forEach((val, idx)=>{
+        const tag = document.createElement("span");
+        tag.className = "tag";
+        tag.innerHTML = `<span></span><button type="button" aria-label="Retirer">×</button>`;
+        tag.querySelector("span").textContent = val;
+        tag.querySelector("button").addEventListener("click", ()=>{
+          state[group][key].splice(idx,1); render(); renderJSON();
+        });
+        tagsEl.appendChild(tag);
+      });
+    }
+    input.addEventListener("keydown", (e)=>{
+      if (e.key === "Enter" && input.value.trim()){
+        e.preventDefault();
+        state[group][key].push(input.value.trim());
+        input.value = "";
+        render(); renderJSON();
+      }
+    });
+    render();
+  });
+
+  // conversion funnel — ordered steps
+  const funnelList = document.getElementById("funnel-list");
+  function renderFunnel(){
+    funnelList.innerHTML = "";
+    state.regles.conversion_funnel.forEach((step, idx)=>{
+      const row = document.createElement("div");
+      row.className = "funnel-step";
+      row.innerHTML = `<span class="step-index">${idx+1}.</span>
+        <input type="text" value="${step.replace(/"/g,'&quot;')}" placeholder="Ex. Audit demandé">
+        <button type="button">Retirer</button>`;
+      row.querySelector("input").addEventListener("input", (e)=>{
+        state.regles.conversion_funnel[idx] = e.target.value; renderJSON();
+      });
+      row.querySelector("button").addEventListener("click", ()=>{
+        state.regles.conversion_funnel.splice(idx,1); renderFunnel(); renderJSON();
+      });
+      funnelList.appendChild(row);
+    });
+  }
+  document.getElementById("add-funnel-step").addEventListener("click", ()=>{
+    state.regles.conversion_funnel.push("");
+    renderFunnel(); renderJSON();
+  });
+  renderFunnel();
+
+  // actions checklist
+  const actionsGrid = document.getElementById("actions-grid");
+  ACTIONS.forEach(([id, label])=>{
+    const row = document.createElement("label");
+    row.className = "checkbox-row";
+    row.innerHTML = `<input type="checkbox" data-action="${id}">
+      <span><span class="cb-label">${label}</span><br><span class="cb-sub">${id}</span></span>`;
+    row.querySelector("input").addEventListener("change", (e)=>{
+      if (e.target.checked){ state.actions_enabled.push(id); }
+      else { state.actions_enabled = state.actions_enabled.filter(a=>a!==id); }
+      renderJSON();
+    });
+    actionsGrid.appendChild(row);
+  });
+
+  // preview actions
+  document.getElementById("copy-json").addEventListener("click", ()=>{
+    navigator.clipboard.writeText(JSON.stringify(state, null, 2));
+  });
+  document.getElementById("download-json").addEventListener("click", ()=>{
+    const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "fiche-client-pactelys.json";
+    a.click();
+  });
+
+  renderJSON();
+
+  // --- SOUMISSION À L'API ---
+
+// --- SOUMISSION À L'API ---
+const API_BASE_URL = 'http://149.102.146.195:8001';  // Remplacez par l'IP de votre VPS
+
+document.getElementById('submit-config').addEventListener('click', async () => {
+  const btn = document.getElementById('submit-config');
+  const status = document.getElementById('submit-status');
+  
+  btn.disabled = true;
+  status.className = 'submit-status loading';
+  status.textContent = '📡 Envoi en cours...';
+  
+  try {
+    console.log('📤 Envoi des données:', state);
+    
+    const response = await fetch(`${API_BASE_URL}/api/client/config`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(state)
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || `Erreur HTTP ${response.status}`);
+    }
+    
+    const result = await response.json();
+    
+    // Succès
+    status.className = 'submit-status success';
+    status.innerHTML = `
+      ✓ Configuration envoyée avec succès !<br>
+      <strong>ID simulé :</strong> ${result.id}<br>
+      <strong>Entreprise :</strong> ${result.received.company}<br>
+      <strong>Champs envoyés :</strong> ${result.received.fields_count}<br>
+      <strong>Actions activées :</strong> ${result.received.actions_enabled.length}<br>
+      <small>${result.timestamp}</small>
+    `;
+    
+    console.log('✅ Réponse API:', result);
+    
+  } catch (error) {
+    status.className = 'submit-status error';
+    status.innerHTML = `
+      ✗ Erreur lors de l'envoi :<br>
+      <small>${error.message}</small>
+    `;
+    
+    console.error('❌ Erreur:', error);
+    
+  } finally {
+    btn.disabled = false;
+  }
+});
+</script>
+
+</body>
+</html>

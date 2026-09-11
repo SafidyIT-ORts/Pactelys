@@ -1,0 +1,96 @@
+[
+  {
+    "action_id": "generate_blog_article",
+    "label": "Rédiger un article de blog",
+    "type": "simple",
+    "uses_web_search": false,
+    "source_names": ["generate-blog", "blog-writer", "seo-writing"]
+  },
+  {
+    "action_id": "plan_content_calendar",
+    "label": "Construire un calendrier éditorial",
+    "type": "simple",
+    "uses_web_search": false,
+    "source_names": ["content-pipeline", "content-strategist", "editorial-ops"]
+  },
+  {
+    "action_id": "audit_website",
+    "label": "Auditer un site (technique, structure, cannibalisation)",
+    "type": "simple",
+    "uses_web_search": true,
+    "source_names": ["audit-site", "technical-lead", "technical-seo"]
+  },
+  {
+    "action_id": "build_keyword_strategy",
+    "label": "Construire une stratégie de mots-clés",
+    "type": "simple",
+    "uses_web_search": false,
+    "source_names": ["build-keyword-strategy", "seo-architect", "keyword-research"]
+  },
+  {
+    "action_id": "optimize_page",
+    "label": "Optimiser une page existante",
+    "type": "simple",
+    "uses_web_search": true,
+    "source_names": ["optimize-page", "content-optimizer", "on-page"]
+  },
+  {
+    "action_id": "produce_social_posts",
+    "label": "Produire des posts réseaux sociaux",
+    "type": "simple",
+    "uses_web_search": false,
+    "source_names": ["produce-assets", "content-producer", "platform-frameworks"]
+  },
+  {
+    "action_id": "design_email_campaign",
+    "label": "Concevoir une campagne email (séquence linéaire)",
+    "type": "simple",
+    "uses_web_search": false,
+    "source_names": ["design-campaign", "email-strategist", "segmentation"]
+  },
+  {
+    "action_id": "build_email_automation",
+    "label": "Construire une automatisation email (déclencheur + logique conditionnelle)",
+    "type": "simple",
+    "uses_web_search": false,
+    "source_names": ["build-automation", "automation-specialist", "drip-campaigns"]
+  },
+  {
+    "action_id": "run_market_landscape_study",
+    "label": "Étude de marché et paysage concurrentiel (desk research)",
+    "type": "pipeline",
+    "steps": [
+      {
+        "step_order": 1,
+        "label": "Recherche et collecte (desk research, sources réelles)",
+        "uses_web_search": true,
+        "source_names": ["run-market-landscape-study", "insights-research-director", "research-brief-blueprint"]
+      },
+      {
+        "step_order": 2,
+        "label": "Modélisation et scénarios",
+        "uses_web_search": false,
+        "source_names": ["quant-insights-architect", "market-scenario-modeler"]
+      }
+    ]
+  },
+  {
+    "action_id": "define_brand_platform",
+    "label": "Définir la plateforme de marque (positionnement, piliers, ton)",
+    "type": "pipeline",
+    "steps": [
+      {
+        "step_order": 1,
+        "label": "Rédaction de la plateforme de marque",
+        "uses_web_search": true,
+        "source_names": ["define-brand-platform", "brand-foundation-architect", "brand-narrative-playbook"]
+      },
+      {
+        "step_order": 2,
+        "label": "Gouvernance, conformité et plan de rollout",
+        "uses_web_search": false,
+        "source_names": ["brand-governance-lead", "brand-governance-os"]
+      }
+    ]
+  }
+]

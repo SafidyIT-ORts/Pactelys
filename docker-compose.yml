@@ -1,0 +1,45 @@
+services:
+  pactelys-postgres:
+    image: postgres:16-alpine
+    container_name: pactelys-postgres
+    environment:
+      POSTGRES_DB: pactelys
+      POSTGRES_USER: pactelys_admin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pactelys_pg_data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5434:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pactelys_admin -d pactelys"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pactelys-api:
+    build: ./backend
+    container_name: pactelys-api
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://pactelys_admin:${POSTGRES_PASSWORD}@pactelys-postgres:5432/pactelys
+    depends_on:
+      - pactelys-postgres
+    networks:
+      - default
+      - n8n_default
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8001:8000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - ./clients:/app/clients
+
+networks:
+  n8n_default:
+    external: true
+
+volumes:
+  pactelys_pg_data:
+  pactelys_client_files:
