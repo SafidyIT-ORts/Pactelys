@@ -1,0 +1,4 @@
+fastapi
+uvicorn[standard]
+crewai
+psycopg2-binary

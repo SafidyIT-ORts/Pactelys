@@ -35,6 +35,17 @@ services:
       - ./backend:/app
       - /app/node_modules
       - ./clients:/app/clients
+  crewai-service:
+    build: ./crewai-service
+    container_name: crewai-service
+    environment:
+      DATABASE_URL: postgresql://pactelys_admin:${POSTGRES_PASSWORD}@pactelys-postgres:5432/pactelys
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+    depends_on:
+      - pactelys-postgres
+    networks:
+      - default
+      - n8n_default
 
 networks:
   n8n_default:
